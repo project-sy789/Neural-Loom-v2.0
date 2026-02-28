@@ -60,6 +60,8 @@ const api = {
         }
         return mem;
     },
+    // Context Building (For Session Starts)
+    buildContext: () => memoryManager.buildContext(),
     // Tier 4
     saveSkill: (name, steps) => skillManager.saveSkill(name, steps),
     recallSkill: (name) => skillManager.recallSkill(name),

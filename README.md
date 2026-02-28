@@ -56,6 +56,10 @@ git push -u origin main
 ```javascript
 const memoryApi = require('./neural-loom/index.js');
 
+// เริ่มต้น Session ใหม่ (ดึงความจำเก่ามารวมเป็น Prompt เและตัวตนของ AI)
+const systemContext = memoryApi.buildContext();
+console.log("นำข้อความนี้ไปใส่ใน System Prompt ก่อนเริ่มคุย:", systemContext);
+
 // สร้างความจำใหม่ (Add Memory) - ระบบจะ commit Git ทันที
 await memoryApi.addMemory("ผู้ใช้บอกว่าเขาชอบทานไอศกรีมรสสตรอเบอร์รี่");
 

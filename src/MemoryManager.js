@@ -132,6 +132,49 @@ Return ONLY a valid JSON string array of 1 to 3 new traits. E.g. ["Helpful", "Pr
         }
         return null;
     }
+
+    /**
+     * Build Session Context (Injection Method)
+     * Compiles Tier 5, Tier 3, and recent Tier 2 into a system prompt payload
+     */
+    buildContext() {
+        let contextParts = [];
+
+        // 1. Load Tier 5 (Meta Identity)
+        const meta = this.getMetaProfile();
+        if (meta && meta.traits && meta.traits.length > 0) {
+            contextParts.push(`[My Identity & Traits]: ${meta.traits.join(', ')}`);
+        }
+
+        // 2. Load Tier 3 (Semantic Facts)
+        const semanticPath = path.join(config.paths.semantic, 'facts.json');
+        if (fs.existsSync(semanticPath)) {
+            const facts = JSON.parse(fs.readFileSync(semanticPath, 'utf-8'));
+            if (facts.general_facts && facts.general_facts.length > 0) {
+                contextParts.push(`[Core Facts]: ${facts.general_facts.slice(-5).join(' | ')}`);
+            }
+        }
+
+        // 3. Load Tier 2 (Recent/Strong Episodic Memories)
+        const files = fs.readdirSync(config.paths.episodic).filter(f => f.endsWith('.json'));
+        let recentMemories = [];
+        files.forEach(file => {
+            try {
+                const mem = JSON.parse(fs.readFileSync(path.join(config.paths.episodic, file), 'utf-8'));
+                recentMemories.push(mem);
+            } catch (e) { }
+        });
+
+        // Sort by recency and strength
+        recentMemories.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const topMemories = recentMemories.slice(0, 5).map(m => m.content);
+
+        if (topMemories.length > 0) {
+            contextParts.push(`[Recent Memories]:\n- ${topMemories.join('\n- ')}`);
+        }
+
+        return contextParts.join('\n\n');
+    }
 }
 
 module.exports = MemoryManager;
