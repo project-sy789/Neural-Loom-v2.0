@@ -48,8 +48,28 @@ if [ ! -d ".git" ]; then
     
     # Initial commit
     git add .
-    git commit -m "chore: Initialize Neural Loom Memory System v2.0"
+    git commit -m "chore: Initialize Neural Loom Memory System v2.1"
     echo "✅ Git repository initialized."
+
+    # Ask for GitHub configuration for automated remote backup
+    echo ""
+    echo "================================================="
+    echo " 🌐 ตระเตรียมระบบ GitHub Remote Backup (Optional) "
+    echo "================================================="
+    echo "ระบบ Neural Loom ถูกออกแบบให้สำรองความจำอัจฉริยะแบบ Private บน GitHub ได้"
+    read -p "ต้องการตั้งค่า Remote Repository ตอนนี้เลยไหม? (y/N): " SETUP_REMOTE
+    if [[ "$SETUP_REMOTE" == "y" || "$SETUP_REMOTE" == "Y" ]]; then
+        read -p "กรุณาใส่ GitHub Repository URL พร้อม Access Token: (เช่น https://<TOKEN>@github.com/User/Repo.git): " GIT_REMOTE_URL
+        if [[ -n "$GIT_REMOTE_URL" ]]; then
+            git remote add origin "$GIT_REMOTE_URL"
+            # We don't push immediately because there might be no remote branch existing depending on setup, but it's configured.
+            echo "✅ นำเข้า Remote URL เก็บไว้สำหรับ Auto-Backup ทุก 12 ชั่วโมงเรียบร้อย!"
+        else
+            echo "⚠️ ไม่พบ URL ขอข้ามการตั้งค่า Remote Push..."
+        fi
+    else
+        echo "⏭️ ข้ามการตั้งค่า Remote Push (คุณสามารถตั้งค่าเองได้ภายหลังผ่านคำสั่ง git remote add origin)"
+    fi
 else
     echo "✅ Git repository already exists."
 fi
