@@ -13,6 +13,10 @@ const memoryManager = new MemoryManager();
 const backupService = require('./src/BackupService');
 const bs = new backupService();
 const consolidator = new Consolidator(memoryManager);
+const Reporter = require('./src/Reporter');
+
+// Boot Notification
+Reporter.sendTelegramMessage("🟢 *Neural Loom Memory Node Started* \\(v2.2\\)\n_System is alive and listening..._");
 
 // Schedule Daily Consolidation at 00:00
 cron.schedule('0 0 * * *', () => {
@@ -22,9 +26,10 @@ cron.schedule('0 0 * * *', () => {
 });
 
 // Schedule Auto-Tar Backup every 6 hours
-cron.schedule('0 */6 * * *', () => {
+cron.schedule('0 */6 * * *', async () => {
     console.log(`[Cron] Triggering Auto-Tar Backup`);
     bs.createTarBackup();
+    await Reporter.sendTelegramMessage("📦 *Memory Backup Completed* \n_System created a new tar archive successfully._");
 });
 
 // Schedule Remote Push every 12 hours (Requires setup)

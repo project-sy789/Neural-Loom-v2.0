@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config');
 const SemanticExtractor = require('./SemanticExtractor');
+const Reporter = require('./Reporter');
 
 class Consolidator {
     constructor(memoryManager) {
@@ -86,6 +87,13 @@ ${decayingMemories.join('\n')}
         }
 
         console.log(`[Consolidator] Finished. Archived: ${archivedCount}, Survived: ${survivedCount}`);
+
+        // Stage 5: Reporting
+        await Reporter.sendDailyConsolidationReport({
+            survived: survivedCount,
+            archived: archivedCount,
+            newSemanticGroups: Object.keys(this.semanticExtractor.getFacts().entities || {}).length
+        });
     }
 }
 

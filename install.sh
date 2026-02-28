@@ -70,6 +70,27 @@ if [ ! -d ".git" ]; then
     else
         echo "⏭️ ข้ามการตั้งค่า Remote Push (คุณสามารถตั้งค่าเองได้ภายหลังผ่านคำสั่ง git remote add origin)"
     fi
+    # Ask for Telegram configuration
+    echo ""
+    echo "================================================="
+    echo " 📱 ตระเตรียมระบบแจ้งเตือนผ่าน Telegram (Optional) "
+    echo "================================================="
+    echo "ระบบเสริมสามารถแจ้งเตือนรายงานการสรุปความจำและ Backup เข้ามือถือได้"
+    read -p "ต้องการตั้งค่า Telegram Bot ตอนนี้เลยไหม? (y/N): " SETUP_TG
+    if [[ "$SETUP_TG" == "y" || "$SETUP_TG" == "Y" ]]; then
+        read -p "TELEGRAM_BOT_TOKEN (จาก BotFather): " TG_TOKEN
+        read -p "TELEGRAM_CHAT_ID (ไอดีแชทของคุณ): " TG_CHAT_ID
+        if [[ -n "$TG_TOKEN" && -n "$TG_CHAT_ID" ]]; then
+            echo "TELEGRAM_BOT_TOKEN=$TG_TOKEN" > "$MEMORY_DIR/.env"
+            echo "TELEGRAM_CHAT_ID=$TG_CHAT_ID" >> "$MEMORY_DIR/.env"
+            echo "✅ บันทึกตั้งค่า Telegram แจ้งเตือนลง .env เรียบร้อย!"
+        else
+            echo "⚠️ ใส่ข้อมูลไม่ครบ ขอข้ามการตั้งค่า Telegram..."
+        fi
+    else
+        echo "⏭️ ข้ามการตั้งค่า Telegram..."
+    fi
+
 else
     echo "✅ Git repository already exists."
 fi
