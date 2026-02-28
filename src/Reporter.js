@@ -1,70 +1,26 @@
-const https = require('https');
-const path = require('path');
-const config = require('./config');
+const EventEmitter = require('events');
 
-// Load environment variables from memory directory
-require('dotenv').config({ path: path.join(config.paths.base, '.env') });
-
-class Reporter {
+/**
+ * Event-Driven Reporter (v2.2)
+ * Emits Neural Loom summaries as Node.js events for the host application to consume.
+ */
+class Reporter extends EventEmitter {
     constructor() {
-        this.telegramToken = process.env.TELEGRAM_BOT_TOKEN;
-        this.chatId = process.env.TELEGRAM_CHAT_ID;
-        this.isEnabled = this.telegramToken && this.chatId;
-
-        if (!this.isEnabled) {
-            console.log(`[Reporter] Telegram reporting is disabled (Missing TOKEN or CHAT_ID in .env)`);
-        }
+        super();
+        console.log(`[Reporter] Registered internal Event Emitter mechanism.`);
     }
 
     /**
-     * Send Markdown formatted message to Telegram
+     * Emit Markdown formatted message externally
      * @param {string} message The markdown message content
      */
     async sendTelegramMessage(message) {
-        if (!this.isEnabled) return false;
+        // We keep the old method name so index.js backward-compatibility doesn't break
+        // but it now acts as an emitter instead of an API dispatcher.
 
-        console.log(`[Reporter] Sending message to Telegram...`);
-
-        const payload = JSON.stringify({
-            chat_id: this.chatId,
-            text: message,
-            parse_mode: 'Markdown'
-        });
-
-        const options = {
-            hostname: 'api.telegram.org',
-            port: 443,
-            path: `/bot${this.telegramToken}/sendMessage`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(payload)
-            }
-        };
-
-        return new Promise((resolve) => {
-            const req = https.request(options, (res) => {
-                let body = '';
-                res.on('data', (d) => body += d);
-                res.on('end', () => {
-                    if (res.statusCode === 200) {
-                        console.log(`[Reporter] ✅ Message successfully sent to Telegram.`);
-                        resolve(true);
-                    } else {
-                        console.error(`[Reporter] ❌ Telegram API Error: ${body}`);
-                        resolve(false);
-                    }
-                });
-            });
-
-            req.on('error', (e) => {
-                console.error(`[Reporter] ❌ Connection error to Telegram: ${e.message}`);
-                resolve(false);
-            });
-
-            req.write(payload);
-            req.end();
-        });
+        console.log(`[Reporter] Emitting notification event to host...`);
+        this.emit('notification', message);
+        return true;
     }
 
     /**
@@ -80,8 +36,10 @@ class Reporter {
 
 _ระบบได้ทำการบันทึกและจัดการทรัพยากรเรียบร้อยแล้ว_ ✨`;
 
+        // Trigger the general notification event
         await this.sendTelegramMessage(msg);
     }
 }
 
+// Export as a singleton so all components (Consolidator, index.js) use the same Emitter instance
 module.exports = new Reporter();

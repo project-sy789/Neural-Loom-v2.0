@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Neural Loom v2.0 Setup Script
+# Neural Loom v2.2 Setup Script
 
-echo "🧠 Initializing Neural Loom v2.0 Environment..."
+echo "🧠 Initializing Neural Loom v2.2 Environment..."
 
 # Define core paths
 MEMORY_DIR="$HOME/.openclaw/v2/memory"
@@ -48,7 +48,7 @@ if [ ! -d ".git" ]; then
     
     # Initial commit
     git add .
-    git commit -m "chore: Initialize Neural Loom Memory System v2.1"
+    git commit -m "chore: Initialize Neural Loom Memory System v2.2"
     echo "✅ Git repository initialized."
 
     # Ask for GitHub configuration for automated remote backup
@@ -70,27 +70,6 @@ if [ ! -d ".git" ]; then
     else
         echo "⏭️ ข้ามการตั้งค่า Remote Push (คุณสามารถตั้งค่าเองได้ภายหลังผ่านคำสั่ง git remote add origin)"
     fi
-    # Ask for Telegram configuration
-    echo ""
-    echo "================================================="
-    echo " 📱 ตระเตรียมระบบแจ้งเตือนผ่าน Telegram (Optional) "
-    echo "================================================="
-    echo "ระบบเสริมสามารถแจ้งเตือนรายงานการสรุปความจำและ Backup เข้ามือถือได้"
-    read -p "ต้องการตั้งค่า Telegram Bot ตอนนี้เลยไหม? (y/N): " SETUP_TG
-    if [[ "$SETUP_TG" == "y" || "$SETUP_TG" == "Y" ]]; then
-        read -p "TELEGRAM_BOT_TOKEN (จาก BotFather): " TG_TOKEN
-        read -p "TELEGRAM_CHAT_ID (ไอดีแชทของคุณ): " TG_CHAT_ID
-        if [[ -n "$TG_TOKEN" && -n "$TG_CHAT_ID" ]]; then
-            echo "TELEGRAM_BOT_TOKEN=$TG_TOKEN" > "$MEMORY_DIR/.env"
-            echo "TELEGRAM_CHAT_ID=$TG_CHAT_ID" >> "$MEMORY_DIR/.env"
-            echo "✅ บันทึกตั้งค่า Telegram แจ้งเตือนลง .env เรียบร้อย!"
-        else
-            echo "⚠️ ใส่ข้อมูลไม่ครบ ขอข้ามการตั้งค่า Telegram..."
-        fi
-    else
-        echo "⏭️ ข้ามการตั้งค่า Telegram..."
-    fi
-
 else
     echo "✅ Git repository already exists."
 fi
@@ -101,6 +80,6 @@ cd - > /dev/null
 npm install
 
 echo ""
-echo "✨ Neural Loom v2.1 setup is complete! ✨"
+echo "✨ Neural Loom v2.2 setup is complete! ✨"
 
 echo "You can now run 'npm start' to begin the cognitive loop."

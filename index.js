@@ -71,7 +71,9 @@ const api = {
     saveSkill: (name, steps) => skillManager.saveSkill(name, steps),
     recallSkill: (name) => skillManager.recallSkill(name),
     // Tier 5 Evolve
-    evolveIdentity: async (recentInteractions) => await memoryManager.evolveIdentity(recentInteractions)
+    evolveIdentity: async (recentInteractions) => await memoryManager.evolveIdentity(recentInteractions),
+    // Event Listeners for Host Application
+    on: (event, callback) => Reporter.on(event, callback)
 };
 
 module.exports = api;
