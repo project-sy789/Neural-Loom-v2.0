@@ -102,6 +102,36 @@ class MemoryManager {
         fs.writeFileSync(config.paths.metaProfile, JSON.stringify(updatedMeta, null, 2));
         return updatedMeta;
     }
+
+    /**
+     * Evolve Meta Profile Identity Tools (Tier 5)
+     * Calls LLM to summarize recent interactions and add new traits based on behavior
+     */
+    async evolveIdentity(recentInteractionsText) {
+        console.log(`[Tier 5] Evolving Meta Identity...`);
+        const llmService = require('./LLMService');
+
+        const prompt = `
+Based on the following recent user interactions, infer one new personality trait or preference the AI should adopt.
+Interactions:
+"${recentInteractionsText}"
+
+Return ONLY a valid JSON string array of 1 to 3 new traits. E.g. ["Helpful", "Prefers short answers"]
+         `;
+
+        const newTraits = await llmService.askLLMForJSON(prompt);
+        if (newTraits && Array.isArray(newTraits)) {
+            let currentMeta = this.getMetaProfile();
+            if (!currentMeta) currentMeta = { traits: [] };
+
+            // Deduplicate traits
+            const currentTraits = currentMeta.traits || [];
+            const mergedTraits = [...new Set([...currentTraits, ...newTraits])];
+
+            return this.updateMetaProfileProfile({ traits: mergedTraits });
+        }
+        return null;
+    }
 }
 
 module.exports = MemoryManager;

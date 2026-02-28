@@ -41,6 +41,9 @@ console.log("   - Remote Push: Every 12 Hours");
 // Simulate Usage Loop or Keep Alive
 console.log("⏳ Service is running. Press Ctrl+C to exit.");
 
+const SkillManager = require('./src/SkillManager');
+const skillManager = new SkillManager();
+
 /**
  * Example APIs for interacting with memory (for integration into other OpenClaw components)
  */
@@ -56,7 +59,12 @@ const api = {
             await bs.autoCommit(`feat: Recalled and boosted memory ${id}`);
         }
         return mem;
-    }
+    },
+    // Tier 4
+    saveSkill: (name, steps) => skillManager.saveSkill(name, steps),
+    recallSkill: (name) => skillManager.recallSkill(name),
+    // Tier 5 Evolve
+    evolveIdentity: async (recentInteractions) => await memoryManager.evolveIdentity(recentInteractions)
 };
 
 module.exports = api;

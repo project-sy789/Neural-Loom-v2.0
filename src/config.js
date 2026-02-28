@@ -12,7 +12,9 @@ module.exports = {
         episodic: path.join(MEMORY_BASE_DIR, 'episodic'),
         procedural: path.join(MEMORY_BASE_DIR, 'procedural'),
         semantic: path.join(MEMORY_BASE_DIR, 'semantic-index'),
+        archive: path.join(MEMORY_BASE_DIR, 'archive'),
         metaProfile: path.join(MEMORY_BASE_DIR, 'meta-profile.json'),
+
         backups: BACKUP_DIR
     },
     decayRates: {

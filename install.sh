@@ -9,14 +9,18 @@ MEMORY_DIR="$HOME/.openclaw/v2/memory"
 EPISODIC_DIR="$MEMORY_DIR/episodic"
 PROCEDURAL_DIR="$MEMORY_DIR/procedural"
 SEMANTIC_DIR="$MEMORY_DIR/semantic-index"
+ARCHIVE_DIR="$MEMORY_DIR/archive"
 BACKUP_DIR="$HOME/.openclaw/backups"
+
 
 # Create directories
 echo "📂 Creating directory structure..."
 mkdir -p "$EPISODIC_DIR"
 mkdir -p "$PROCEDURAL_DIR"
 mkdir -p "$SEMANTIC_DIR"
+mkdir -p "$ARCHIVE_DIR"
 mkdir -p "$BACKUP_DIR"
+
 
 # Initialize Meta Profile if it doesn't exist
 META_PROFILE="$MEMORY_DIR/meta-profile.json"
@@ -56,5 +60,6 @@ cd - > /dev/null
 npm install
 
 echo ""
-echo "✨ Neural Loom v2.0 setup is complete! ✨"
+echo "✨ Neural Loom v2.1 setup is complete! ✨"
+
 echo "You can now run 'npm start' to begin the cognitive loop."
