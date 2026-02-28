@@ -1,0 +1,62 @@
+require('fs');
+const cron = require('node-cron');
+const MemoryManager = require('./src/MemoryManager');
+const Consolidator = require('./src/Consolidator');
+const BackupService = require('./src/BackupService');
+
+console.log("==========================================");
+console.log("🧠 Starting Neural Loom v2.0 Memory Service");
+console.log("==========================================");
+
+// Initialize Components
+const memoryManager = new MemoryManager();
+const backupService = require('./src/BackupService');
+const bs = new backupService();
+const consolidator = new Consolidator(memoryManager);
+
+// Schedule Daily Consolidation at 00:00
+cron.schedule('0 0 * * *', () => {
+    console.log(`[Cron] Triggering Daily Consolidation`);
+    consolidator.runDaily();
+    bs.autoCommit("chore: Daily consolidation completed");
+});
+
+// Schedule Auto-Tar Backup every 6 hours
+cron.schedule('0 */6 * * *', () => {
+    console.log(`[Cron] Triggering Auto-Tar Backup`);
+    bs.createTarBackup();
+});
+
+// Schedule Remote Push every 12 hours (Requires setup)
+cron.schedule('0 */12 * * *', () => {
+    console.log(`[Cron] Triggering Remote Push`);
+    bs.pushToRemote();
+});
+
+console.log("✅ Cron Jobs Scheduled.");
+console.log("   - Consolidation: Daily at 00:00");
+console.log("   - Tar Backup: Every 6 Hours");
+console.log("   - Remote Push: Every 12 Hours");
+
+// Simulate Usage Loop or Keep Alive
+console.log("⏳ Service is running. Press Ctrl+C to exit.");
+
+/**
+ * Example APIs for interacting with memory (for integration into other OpenClaw components)
+ */
+const api = {
+    addMemory: async (content) => {
+        const mem = memoryManager.addEpisodicMemory(content);
+        await bs.autoCommit(`feat: Added semantic chunk ${mem.id}`);
+        return mem;
+    },
+    recallMemory: async (id) => {
+        const mem = memoryManager.recallEpisodicMemory(id);
+        if (mem) {
+            await bs.autoCommit(`feat: Recalled and boosted memory ${id}`);
+        }
+        return mem;
+    }
+};
+
+module.exports = api;

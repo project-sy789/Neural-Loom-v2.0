@@ -1,0 +1,16 @@
+{
+  "name": "neural-loom",
+  "version": "2.0.0",
+  "description": "5-Tier Cognitive Architecture for OpenClaw Memory System",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3",
+    "simple-git": "^3.22.0"
+  },
+  "author": "OpenClaw AI",
+  "license": "MIT"
+}
