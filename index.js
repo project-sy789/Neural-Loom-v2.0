@@ -4,8 +4,10 @@ const MemoryManager = require('./src/MemoryManager');
 const Consolidator = require('./src/Consolidator');
 const BackupService = require('./src/BackupService');
 
+const startTime = Date.now();
+
 console.log("==========================================");
-console.log("🧠 Starting Neural Loom v2.0 Memory Service");
+console.log("🧠 Starting Neural Loom v2.3 Memory Service");
 console.log("==========================================");
 
 // Initialize Components
@@ -15,8 +17,19 @@ const bs = new backupService();
 const consolidator = new Consolidator(memoryManager);
 const Reporter = require('./src/Reporter');
 
+// Helper: build a short system status string
+function buildHeartbeat() {
+    const episodicFiles = require('fs').readdirSync(memoryManager.episodicPath || require('./src/config').paths.episodic).filter(f => f.endsWith('.json'));
+    const uptimeMins = Math.floor((Date.now() - startTime) / 60000);
+    const uptimeStr = uptimeMins < 60 ? `${uptimeMins}m` : `${Math.floor(uptimeMins / 60)}h ${uptimeMins % 60}m`;
+    return `💓 *Neural Loom — Heartbeat*
+🕐 Uptime: \`${uptimeStr}\`
+🧠 Episodic memories: \`${episodicFiles.length}\` เหตุการณ์
+⚙️ All systems nominal ✅`;
+}
+
 // Boot Notification
-Reporter.sendTelegramMessage("🟢 *Neural Loom Memory Node Started* \\(v2.2\\)\n_System is alive and listening..._");
+Reporter.sendTelegramMessage("🟢 *Neural Loom v2.3 Started*\n_System is alive and listening..._");
 
 // Schedule Daily Consolidation at 00:00
 cron.schedule('0 0 * * *', () => {
@@ -38,10 +51,17 @@ cron.schedule('0 */12 * * *', () => {
     bs.pushToRemote();
 });
 
+// Schedule Hourly Heartbeat
+cron.schedule('0 * * * *', async () => {
+    console.log(`[Cron] Sending Heartbeat`);
+    await Reporter.sendTelegramMessage(buildHeartbeat());
+});
+
 console.log("✅ Cron Jobs Scheduled.");
+console.log("   - Heartbeat:    Every Hour");
 console.log("   - Consolidation: Daily at 00:00");
-console.log("   - Tar Backup: Every 6 Hours");
-console.log("   - Remote Push: Every 12 Hours");
+console.log("   - Tar Backup:   Every 6 Hours");
+console.log("   - Remote Push:  Every 12 Hours");
 
 // Simulate Usage Loop or Keep Alive
 console.log("⏳ Service is running. Press Ctrl+C to exit.");
