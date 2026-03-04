@@ -51,10 +51,26 @@ cron.schedule('0 */12 * * *', () => {
     bs.pushToRemote();
 });
 
-// Schedule Hourly Heartbeat
+// Schedule Hourly Change-Detection Heartbeat
+let _lastMemoryCount = -1;
 cron.schedule('0 * * * *', async () => {
-    console.log(`[Cron] Sending Heartbeat`);
-    await Reporter.sendTelegramMessage(buildHeartbeat());
+    const config = require('./src/config');
+    const fs = require('fs');
+    const currentCount = fs.readdirSync(config.paths.episodic).filter(f => f.endsWith('.json')).length;
+
+    if (currentCount !== _lastMemoryCount) {
+        const delta = _lastMemoryCount === -1 ? currentCount : currentCount - _lastMemoryCount;
+        const sign = delta >= 0 ? `+${delta}` : `${delta}`;
+        console.log(`[Heartbeat] Memory count changed: ${_lastMemoryCount} -> ${currentCount}`);
+        await Reporter.sendTelegramMessage(
+            `💓 *Neural Loom — Status Update*\n` +
+            `🧠 Memories: \`${currentCount}\` เหตุการณ์ (${sign} ชั่วโมงนี้)\n` +
+            `⚙️ All systems nominal ✅`
+        );
+        _lastMemoryCount = currentCount;
+    } else {
+        console.log(`[Heartbeat] No change (${currentCount} memories). Silent.`);
+    }
 });
 
 console.log("✅ Cron Jobs Scheduled.");
