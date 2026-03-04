@@ -79,7 +79,35 @@ echo "📦 Installing Node.js dependencies..."
 cd - > /dev/null
 npm install
 
+# PM2 - Auto-start service manager
 echo ""
-echo "✨ Neural Loom v2.2 setup is complete! ✨"
+echo "================================================="
+echo " 🚀 ตั้งค่า PM2 (Auto-start Service Manager)    "
+echo "================================================="
 
-echo "You can now run 'npm start' to begin the cognitive loop."
+if ! command -v pm2 &> /dev/null; then
+    echo "ติดตั้ง PM2..."
+    npm install -g pm2
+fi
+
+# Create log directory
+mkdir -p "$MEMORY_DIR/logs"
+
+# Start Neural Loom with PM2
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
+cd "$APP_DIR"
+
+pm2 start ecosystem.config.js 2>/dev/null || pm2 restart neural-loom
+pm2 save
+
+# Register to start on OS boot
+echo ""
+echo "📌 กำลังลงทะเบียน Neural Loom ให้รันอัตโนมัติเมื่อเปิดเครื่อง..."
+pm2 startup 2>/dev/null | tail -1 | bash 2>/dev/null || \
+    echo "⚠️  (ทำ startup อัตโนมัติไม่ได้ - รัน 'pm2 startup' แล้วทำตามคำแนะนำ)"
+
+echo ""
+echo "✨ Neural Loom v2.3 setup is complete! ✨"
+echo "   → Neural Loom is running in background via PM2"
+echo "   → Check status: pm2 status"
+echo "   → View logs:   pm2 logs neural-loom"
